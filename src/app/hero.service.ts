@@ -3,10 +3,9 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 
 import { Hero } from './hero';
-import { HEROES } from './mock-heroes';
 import { MessageService } from './message.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { catchError, map, tap } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -16,12 +15,16 @@ export class HeroService {
   constructor(private messageService: MessageService,
               private http: HttpClient) { }
 
+  private heroesUrl = 'api/heroes';  // URL to web api
+
+  httpOptions = {
+    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+  };
+
   /** Log a HeroService message with the MessageService */
   private log(message: string) {
     this.messageService.add(`HeroService: ${message}`);
   }
-
-  private heroesUrl = 'api/heroes';  // URL to web api
 
   /** GET heroes from the server */
   getHeroes(): Observable<Hero[]> {
@@ -38,7 +41,7 @@ export class HeroService {
    * @param operation - name of the operation that failed
    * @param result - optional value to return as the observable result
    */
-  private handleError<T>(operation = 'operation', result?: T) {
+  private handleError<T>(operation = 'operation', result?: T): any {
     return (error: any): Observable<T> => {
 
       // TODO: send the error to remote logging infrastructure
@@ -68,10 +71,6 @@ export class HeroService {
       catchError(this.handleError<any>('updateHero'))
     );
   }
-
-  httpOptions = {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-  };
 
   /** POST: add a new hero to the server */
   addHero(hero: Hero): Observable<Hero> {
